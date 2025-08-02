@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MoodBoard AI</string>
+    <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_FROM_GOOGLE_SERVICES_JSON</string>
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+</resources>

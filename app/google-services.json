@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "214136236589",
+    "project_id": "moodboard-ai-e3738",
+    "storage_bucket": "moodboard-ai-e3738.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214136236589:android:687e1ea93bd8f05735a6a4",
+        "android_client_info": {
+          "package_name": "com.example.mindspace"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtKFhmG38zC3gddsz-q-Uzf8B-JnyGNEs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
