@@ -1,8 +1,5 @@
 <resources>
-    <string name="app_name">MindSpace</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="app_name">MoodBoard AI</string>
     <string name="default_web_client_id">YOUR_WEB_CLIENT_ID_FROM_GOOGLE_SERVICES_JSON</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
