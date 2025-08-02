@@ -1,7 +1,5 @@
 package com.moodboardai.app.ui.screens
 
-import android.app.Activity
-import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,7 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.moodboardai.app.viewmodel.AuthViewModel
+import com.example.mindspace.viewmodel.AuthViewModel
 
 @Composable
 fun Register(

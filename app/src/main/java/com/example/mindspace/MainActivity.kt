@@ -8,9 +8,9 @@ import androidx.navigation.compose.rememberNavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.moodboardai.app.ui.theme.MoodBoardAITheme
-import com.moodboardai.app.viewmodel.AuthViewModel
-import com.moodboardai.app.utils.NavGraph
+import com.example.mindspace.ui.theme.MindSpaceTheme
+import com.example.mindspace.viewmodel.AuthViewModel
+import com.example.mindspace.utils.NavGraph
 
 class MainActivity : ComponentActivity() {
 
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         setContent {
-            MoodBoardAITheme {
+            MindSpaceTheme {
                 val navController = rememberNavController()
                 val authViewModel: AuthViewModel = viewModel()
 

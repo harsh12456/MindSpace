@@ -8,7 +8,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.moodboardai.app.ui.screens.HomeScreen
 import com.example.mindspace.ui.screens.LoginScreen
 import com.moodboardai.app.ui.screens.Register
-import com.moodboardai.app.viewmodel.AuthViewModel
+import com.example.mindspace.viewmodel.AuthViewModel
 
 @Composable
 fun NavGraph(

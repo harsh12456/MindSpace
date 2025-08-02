@@ -1,6 +1,5 @@
-package com.moodboardai.app.services.firebase
+package com.example.mindspace.services.Firebase
 
-import android.app.Activity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.AuthResult

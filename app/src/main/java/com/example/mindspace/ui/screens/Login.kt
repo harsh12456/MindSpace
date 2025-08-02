@@ -18,7 +18,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.moodboardai.app.viewmodel.AuthViewModel
+import com.example.mindspace.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 
 private val identity: Any

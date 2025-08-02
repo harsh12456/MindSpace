@@ -1,11 +1,11 @@
-package com.moodboardai.app.viewmodel
+package com.example.mindspace.viewmodel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.moodboardai.app.model.AuthUiState
-import com.moodboardai.app.repository.AuthRepository
+import com.example.mindspace.model.AuthUiState
+import com.example.mindspace.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,8 +32,12 @@ class AuthViewModel @Inject constructor(
     fun login(email: String, password: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(loading = true) }
-            val success = repository.login(email, password)
-            _uiState.update { it.copy(loading = false, loginSuccess = success) }
+            try {
+                val success = repository.login(email, password)
+                _uiState.update { it.copy(loading = false, loginSuccess = success, error = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(loading = false, loginSuccess = false, error = e.message) }
+            }
         }
     }
 
