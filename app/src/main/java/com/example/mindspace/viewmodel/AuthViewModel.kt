@@ -44,9 +44,5 @@ class AuthViewModel @Inject constructor(
             }
         }
     }
-
-    fun loginWithGoogle(context: Context, navController: NavController) {
-        repository.loginWithGoogle(context, navController)
-    }
 }
 

@@ -1,30 +1,30 @@
 [versions]
-agp = "8.1.2"
-kotlin = "1.9.24"
-composeCompiler = "1.5.14"
-composeBom = "2024.05.00"
-firebase-bom = "34.0.0"
+agp = "8.8.0"
+kotlin = "2.1.0"
+composeCompiler = "1.5.15"
+composeBom = "2024.12.01"
+firebase-bom = "33.7.0"
 googleServices = "4.4.3"
-hilt = "2.51.1"
-coreKtx = "1.12.0"
+hilt = "2.54"
+coreKtx = "1.15.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-appcompat = "1.6.1"
-material = "1.11.0"
-constraintlayout = "2.1.4"
-lifecycleLivedataKtx = "2.6.2"
-lifecycleViewmodelKtx = "2.6.2"
-lifecycleViewmodelCompose = "2.6.2"
-navigationFragmentKtx = "2.7.7"
-navigationUiKtx = "2.7.7"
-navigationCompose = "2.7.7"
-activity-compose = "1.8.2"
-playServicesAuth = "20.7.0"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+appcompat = "1.7.0"
+material = "1.12.0"
+constraintlayout = "2.2.0"
+lifecycleLivedataKtx = "2.8.7"
+lifecycleViewmodelKtx = "2.8.7"
+lifecycleViewmodelCompose = "2.8.7"
+navigationFragmentKtx = "2.8.5"
+navigationUiKtx = "2.8.5"
+navigationCompose = "2.8.5"
+activityCompose = "1.9.3"
+playServicesAuth = "21.2.0"
 
 [libraries]
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -51,3 +51,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
