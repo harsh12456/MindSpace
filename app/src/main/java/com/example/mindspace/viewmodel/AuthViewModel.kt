@@ -23,15 +23,19 @@ class AuthViewModel @Inject constructor(
 
     fun register(name: String, email: String, password: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(loading = true) }
-            val success = repository.register(name, email, password)
-            _uiState.update { it.copy(loading = false, registerSuccess = success) }
+            _uiState.update { it.copy(loading = true, error = null) }
+            try {
+                val success = repository.register(name, email, password)
+                _uiState.update { it.copy(loading = false, registerSuccess = success, error = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(loading = false, registerSuccess = false, error = e.message) }
+            }
         }
     }
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(loading = true) }
+            _uiState.update { it.copy(loading = true, error = null) }
             try {
                 val success = repository.login(email, password)
                 _uiState.update { it.copy(loading = false, loginSuccess = success, error = null) }

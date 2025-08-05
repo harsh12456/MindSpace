@@ -1,4 +1,4 @@
-package com.moodboardai.app.model
+package com.example.mindspace.model
 
 data class AuthUiState(
     val loading: Boolean = false,

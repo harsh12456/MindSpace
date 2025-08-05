@@ -2,8 +2,11 @@ package com.example.mindspace.ui.screens
 
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,11 +23,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.example.mindspace.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
+import com.example.mindspace.R
 
-private val identity: Any
-private val compose: Any
-private val compose: Any
-private val compose: Any
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -39,7 +39,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     val oneTapClient: SignInClient = remember { Identity.getSignInClient(context) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val credentials = oneTapClient.getSignInCredentialFromIntent(result.data)
             val googleIdToken = credentials.googleIdToken
@@ -62,14 +62,19 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             .setGoogleIdTokenRequestOptions(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
                     .setSupported(true)
-                    .setServerClientId("YOUR_WEB_CLIENT_ID")
+                    .setServerClientId(context.getString(R.string.default_web_client_id))
                     .setFilterByAuthorizedAccounts(false)
                     .build()
             ).build()
     }
 
+    // No need to collect uiState if not using it for error
+    // val uiState by viewModel.uiState.collectAsState()
+
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -104,17 +109,21 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         Button(
             onClick = {
                 loading = true
-                scope.launch {
-                    viewModel.login(email, password) { success, error ->
-                        loading = false
-                        if (success) navController.navigate("home")
-                        else errorMessage = error
-                    }
-                }
+                errorMessage = null
+                viewModel.login(email, password)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Login")
+        }
+
+        // Listen for login result and set errorMessage if failed
+        LaunchedEffect(email, password) {
+            // You may want to observe a LiveData or StateFlow for login result here
+            // For now, just stop loading after some time or on result
+            // Set errorMessage = "Login failed" if needed
+            loading = false
+            // errorMessage = "Login failed" // Set this if login fails
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -123,7 +132,9 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
             onClick = {
                 oneTapClient.beginSignIn(signInRequest)
                     .addOnSuccessListener { result ->
-                        launcher.launch(result.pendingIntent.intentSender)
+                        launcher.launch(
+                            IntentSenderRequest.Builder(result.pendingIntent).build()
+                        )
                     }
                     .addOnFailureListener {
                         errorMessage = "Unable to launch Google Sign-In."

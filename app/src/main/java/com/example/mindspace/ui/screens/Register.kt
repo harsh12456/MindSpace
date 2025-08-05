@@ -1,4 +1,4 @@
-package com.moodboardai.app.ui.screens
+package com.example.mindspace.ui.screens
 
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
