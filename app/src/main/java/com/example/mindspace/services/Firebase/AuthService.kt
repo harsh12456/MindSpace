@@ -3,7 +3,6 @@ package com.example.mindspace.services.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.AuthResult
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import kotlinx.coroutines.tasks.await
 
 object FirebaseAuthService {
@@ -19,8 +18,8 @@ object FirebaseAuthService {
         return auth.createUserWithEmailAndPassword(email, password).await()
     }
 
-    suspend fun loginWithGoogle(account: GoogleSignInAccount): AuthResult {
-        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+    suspend fun loginWithGoogle(idToken: String): AuthResult {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
         return auth.signInWithCredential(credential).await()
     }
 

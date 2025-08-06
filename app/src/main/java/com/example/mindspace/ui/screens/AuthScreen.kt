@@ -1,13 +1,8 @@
-
 package com.example.mindspace.ui.screens
 
 import android.app.Activity
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -24,10 +19,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.Identity
-import com.google.android.gms.auth.api.identity.SignInClient
-import com.google.android.gms.common.api.ApiException
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.lifecycle.viewModelScope
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.example.mindspace.viewmodel.AuthViewModel
@@ -60,53 +59,18 @@ fun AuthScreen(
     var shakeForm by remember { mutableStateOf(false) }
     var showSuccess by remember { mutableStateOf(false) }
 
-    var isGoogleExpanded by remember { mutableStateOf(false) }
+    // Credential Manager setup
+    val credentialManager = CredentialManager.create(context)
 
-    val signInRequest = BeginSignInRequest.builder()
-        .setGoogleIdTokenRequestOptions(
-            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                .setSupported(true)
-                .setServerClientId(context.getString(R.string.default_web_client_id))
-                .setFilterByAuthorizedAccounts(false)
-                .build()
-        )
+    val googleIdOption = GetGoogleIdOption.Builder()
+        .setServerClientId(context.getString(R.string.default_web_client_id))
+        .setFilterByAuthorizedAccounts(false)
+        .setAutoSelectEnabled(true)
         .build()
 
-    val oneTapClient: SignInClient = remember { Identity.getSignInClient(context) }
-    val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartIntentSenderForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            try {
-                val credentials = oneTapClient.getSignInCredentialFromIntent(result.data)
-                val googleIdToken = credentials.googleIdToken
-                if (googleIdToken != null) {
-                    val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
-                    auth.signInWithCredential(firebaseCredential)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                showSuccess = true
-                                navController.navigate("home") {
-                                    popUpTo("auth") { inclusive = true }
-                                }
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Authentication failed",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                }
-            } catch (e: ApiException) {
-                Toast.makeText(
-                    context,
-                    "Google Sign-In failed: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-    }
+    val request = GetCredentialRequest.Builder()
+        .addCredentialOption(googleIdOption)
+        .build()
 
     LaunchedEffect(uiState.loginSuccess, uiState.registerSuccess) {
         if (uiState.loginSuccess || uiState.registerSuccess) {
@@ -142,6 +106,50 @@ fun AuthScreen(
             }
         } else {
             shakeForm = true
+        }
+    }
+
+    fun handleGoogleSignIn() {
+        viewModel.viewModelScope.launch {
+            try {
+                val result = credentialManager.getCredential(
+                    request = request,
+                    context = context as Activity
+                )
+
+                val credential = result.credential
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                val googleIdToken = googleIdTokenCredential.idToken
+
+                val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
+                auth.signInWithCredential(firebaseCredential)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            showSuccess = true
+                            navController.navigate("home") {
+                                popUpTo("auth") { inclusive = true }
+                            }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Authentication failed",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+            } catch (e: GetCredentialException) {
+                Toast.makeText(
+                    context,
+                    "Google Sign-In failed: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } catch (e: GoogleIdTokenParsingException) {
+                Toast.makeText(
+                    context,
+                    "Invalid Google ID token",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -348,33 +356,10 @@ fun AuthScreen(
                         }
 
                         GradientOutlinedButton(
-                            onClick = {
-                                oneTapClient.beginSignIn(signInRequest)
-                                    .addOnSuccessListener { result ->
-                                        try {
-                                            launcher.launch(
-                                                IntentSenderRequest.Builder(result.pendingIntent).build()
-                                            )
-                                        } catch (e: Exception) {
-                                            Toast.makeText(
-                                                context,
-                                                "Error launching Google Sign-In",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    }
-                                    .addOnFailureListener {
-                                        Toast.makeText(
-                                            context,
-                                            "Google Sign-In setup failed",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                            },
+                            onClick = { handleGoogleSignIn() },
                             text = if (isLoginMode) "Continue with Google" else "Sign up with Google",
                             modifier = Modifier.fillMaxWidth()
                         )
-
                     }
                 }
             }

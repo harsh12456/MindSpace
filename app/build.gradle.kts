@@ -30,7 +30,6 @@ android {
         }
     }
 
-    // Add this to fix the stripping issue
     packaging {
         jniLibs {
             keepDebugSymbols += "**/libandroidx.graphics.path.so"
@@ -51,7 +50,6 @@ android {
         viewBinding = true
     }
 
-    // Fix kapt configuration
     kapt {
         correctErrorTypes = true
         arguments {
@@ -62,38 +60,48 @@ android {
 }
 
 dependencies {
+    // Compose BOM
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.activity.compose)
+
+    // Core Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
+
+    // Lifecycle
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // Navigation
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation("androidx.compose.animation:animation-graphics:1.7.6")
-    implementation("com.airbnb.android:lottie-compose:6.1.0")
-    // Add Material Icons - THIS WAS MISSING
-    implementation("androidx.compose.material:material-icons-core:1.7.6")
-    implementation("androidx.compose.material:material-icons-extended:1.7.6")
 
-    // Firebase - Using the versions from BOM
-    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-firestore")
+    // Compose UI
+    implementation(libs.androidx.animation.graphics)
+    implementation(libs.lottie.compose)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.material.icons.extended)
 
-    // Google Play Services - Updated for modern Identity API
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
-    // Hilt - Latest version with Kotlin 2.1 support
-    implementation("com.google.dagger:hilt-android:2.54")
-    kapt("com.google.dagger:hilt-compiler:2.54")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    // Credential Manager & Google Identity
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.google.identity.googleid)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
     // Testing
     testImplementation(libs.junit)
