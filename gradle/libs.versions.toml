@@ -2,6 +2,7 @@
 agp = "8.8.0"
 kotlin = "2.1.0"
 composeBom = "2024.12.01"
+materialIcons = "1.7.6"
 firebase-bom = "33.7.0"
 googleServices = "4.4.3"
 hilt = "2.54"
@@ -27,6 +28,8 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "materialIcons" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIcons" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }

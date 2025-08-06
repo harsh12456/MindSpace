@@ -30,6 +30,13 @@ android {
         }
     }
 
+    // Add this to fix the stripping issue
+    packaging {
+        jniLibs {
+            keepDebugSymbols += "**/libandroidx.graphics.path.so"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
@@ -42,6 +49,15 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+    }
+
+    // Fix kapt configuration
+    kapt {
+        correctErrorTypes = true
+        arguments {
+            arg("dagger.fastInit", "enabled")
+            arg("dagger.hilt.android.internal.disableAndroidSuperclassValidation", "true")
+        }
     }
 }
 
@@ -60,14 +76,19 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation("androidx.compose.animation:animation-graphics:1.7.6")
+    implementation("com.airbnb.android:lottie-compose:6.1.0")
+    // Add Material Icons - THIS WAS MISSING
+    implementation("androidx.compose.material:material-icons-core:1.7.6")
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
 
     // Firebase - Using the versions from BOM
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
 
-    // Google Play Services
-    implementation(libs.play.services.auth)
+    // Google Play Services - Updated for modern Identity API
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
 
     // Hilt - Latest version with Kotlin 2.1 support
     implementation("com.google.dagger:hilt-android:2.54")

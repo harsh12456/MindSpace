@@ -7,21 +7,37 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mindspace.viewmodel.AuthViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun HomeScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
-    // Replace with actual username from your ViewModel or state
-    val username = "User"
+fun HomeScreen(navController: NavController, authViewModel: AuthViewModel) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val username = currentUser?.displayName ?: currentUser?.email ?: "User"
 
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Welcome, $username",
             style = MaterialTheme.typography.headlineMedium
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = {
+                authViewModel.logout()
+                navController.navigate("auth") {
+                    popUpTo(0) { inclusive = true }
+                }
+            }
+        ) {
+            Text("Logout")
+        }
     }
 }
