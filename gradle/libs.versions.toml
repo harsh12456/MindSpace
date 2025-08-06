@@ -1,7 +1,6 @@
 [versions]
 agp = "8.8.0"
 kotlin = "2.1.0"
-composeCompiler = "1.5.15"
 composeBom = "2024.12.01"
 firebase-bom = "33.7.0"
 googleServices = "4.4.3"
@@ -29,8 +28,6 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase-bom" }
-firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
 google-services = { module = "com.google.gms:google-services", version.ref = "googleServices" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

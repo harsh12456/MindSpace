@@ -43,9 +43,6 @@ android {
         compose = true
         viewBinding = true
     }
-
-    // Note: composeOptions is no longer needed with kotlin-compose plugin
-    // The plugin handles compiler configuration automatically
 }
 
 dependencies {
@@ -75,6 +72,7 @@ dependencies {
     // Hilt - Latest version with Kotlin 2.1 support
     implementation("com.google.dagger:hilt-android:2.54")
     kapt("com.google.dagger:hilt-compiler:2.54")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // Testing
     testImplementation(libs.junit)

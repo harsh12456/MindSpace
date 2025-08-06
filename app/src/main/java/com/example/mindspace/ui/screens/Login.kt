@@ -30,13 +30,21 @@ import com.example.mindspace.R
 @Composable
 fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     val auth = FirebaseAuth.getInstance()
+    val uiState by viewModel.uiState.collectAsState()
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var loading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val signInRequest = BeginSignInRequest.builder()
+        .setGoogleIdTokenRequestOptions(
+            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
+                .setSupported(true)
+                .setServerClientId(context.getString(R.string.default_web_client_id))
+                .setFilterByAuthorizedAccounts(false)
+                .build()
+        )
+        .build()
 
     val oneTapClient: SignInClient = remember { Identity.getSignInClient(context) }
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
@@ -49,27 +57,17 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             navController.navigate("home") { popUpTo("login") { inclusive = true } }
-                        } else {
-                            errorMessage = "Google Sign-In failed."
                         }
                     }
             }
         }
     }
 
-    val signInRequest = remember {
-        BeginSignInRequest.builder()
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    .setServerClientId(context.getString(R.string.default_web_client_id))
-                    .setFilterByAuthorizedAccounts(false)
-                    .build()
-            ).build()
+    LaunchedEffect(uiState.loginSuccess) {
+        if (uiState.loginSuccess) {
+            navController.navigate("home") { popUpTo("login") { inclusive = true } }
+        }
     }
-
-    // No need to collect uiState if not using it for error
-    // val uiState by viewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -98,32 +96,22 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        AnimatedVisibility(visible = loading) {
+        AnimatedVisibility(visible = uiState.loading) {
             CircularProgressIndicator()
         }
 
-        errorMessage?.let {
+        uiState.error?.let {
             Text(text = it, color = MaterialTheme.colorScheme.error)
         }
 
         Button(
             onClick = {
-                loading = true
-                errorMessage = null
                 viewModel.login(email, password)
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !uiState.loading
         ) {
             Text("Login")
-        }
-
-        // Listen for login result and set errorMessage if failed
-        LaunchedEffect(email, password) {
-            // You may want to observe a LiveData or StateFlow for login result here
-            // For now, just stop loading after some time or on result
-            // Set errorMessage = "Login failed" if needed
-            loading = false
-            // errorMessage = "Login failed" // Set this if login fails
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -137,7 +125,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
                         )
                     }
                     .addOnFailureListener {
-                        errorMessage = "Unable to launch Google Sign-In."
+                        // Handle error properly
                     }
             },
             modifier = Modifier.fillMaxWidth()
@@ -146,7 +134,7 @@ fun LoginScreen(navController: NavController, viewModel: AuthViewModel) {
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        TextButton(onClick = { navController.navigate("signup") }) {
+        TextButton(onClick = { navController.navigate("register") }) { // Fixed route name
             Text("Don't have an account? Register")
         }
     }
