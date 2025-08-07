@@ -33,6 +33,7 @@ import com.example.mindspace.viewmodel.AuthViewModel
 import com.example.mindspace.ui.components.*
 import com.example.mindspace.ui.theme.MindSpaceColors
 import com.example.mindspace.R
+import com.example.mindspace.services.Firebase.FirebaseAuthService
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -65,7 +66,7 @@ fun AuthScreen(
     val googleIdOption = GetGoogleIdOption.Builder()
         .setServerClientId(context.getString(R.string.default_web_client_id))
         .setFilterByAuthorizedAccounts(false)
-        .setAutoSelectEnabled(true)
+        .setAutoSelectEnabled(false)
         .build()
 
     val request = GetCredentialRequest.Builder()
@@ -90,9 +91,14 @@ fun AuthScreen(
     }
 
     fun validateAndSubmit() {
+        // Enhanced validation with better error messages
         val isNameValid = isLoginMode || name.isNotBlank()
         val isEmailValid = email.isNotBlank() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        val isPasswordValid = password.length >= 6
+        val isPasswordValid = if (isLoginMode) {
+            password.isNotBlank()
+        } else {
+            password.length >= 6
+        }
 
         nameError = !isNameValid
         emailError = !isEmailValid
@@ -106,47 +112,82 @@ fun AuthScreen(
             }
         } else {
             shakeForm = true
+            // Show specific validation messages
+            when {
+                !isEmailValid && email.isNotBlank() -> {
+                    Toast.makeText(context, "Please enter a valid email address", Toast.LENGTH_SHORT).show()
+                }
+                !isPasswordValid && password.isNotBlank() -> {
+                    val message = if (isLoginMode) "Password is required" else "Password must be at least 6 characters"
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
+                !isNameValid && !isLoginMode -> {
+                    Toast.makeText(context, "Full name is required", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
     fun handleGoogleSignIn() {
         viewModel.viewModelScope.launch {
             try {
+                android.util.Log.d("GoogleSignIn", "Starting credential request")
                 val result = credentialManager.getCredential(
                     request = request,
                     context = context as Activity
                 )
 
+                android.util.Log.d("GoogleSignIn", "Credential received successfully")
+
                 val credential = result.credential
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 val googleIdToken = googleIdTokenCredential.idToken
 
-                val firebaseCredential = GoogleAuthProvider.getCredential(googleIdToken, null)
-                auth.signInWithCredential(firebaseCredential)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            showSuccess = true
-                            navController.navigate("home") {
-                                popUpTo("auth") { inclusive = true }
-                            }
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Authentication failed",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                android.util.Log.d("GoogleSignIn", "Token parsed successfully")
+
+                val authResult = FirebaseAuthService.loginWithGoogle(googleIdToken)
+                if (authResult.user != null) {
+                    android.util.Log.d("GoogleSignIn", "Firebase auth successful")
+                    Toast.makeText(context, "Welcome to MindSpace!", Toast.LENGTH_SHORT).show()
+                    showSuccess = true
+                    navController.navigate("home") {
+                        popUpTo("auth") { inclusive = true }
                     }
+                }
             } catch (e: GetCredentialException) {
+                android.util.Log.e("GoogleSignIn", "Error: ${e.message}", e)
+                when (e.type) {
+                    "androidx.credentials.exceptions.GetCredentialCancellationException" -> {
+                        // User cancelled - don't show error
+                        android.util.Log.d("GoogleSignIn", "User cancelled Google Sign-In")
+                    }
+                    "androidx.credentials.exceptions.NoCredentialException" -> {
+                        Toast.makeText(
+                            context,
+                            "No Google accounts found. Please add a Google account in Settings > Accounts > Add account > Google",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    else -> {
+                        Toast.makeText(
+                            context,
+                            "Google Sign-In failed. Please try again or use email/password.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            } catch (e: GoogleIdTokenParsingException) {
+                android.util.Log.e("GoogleSignIn", "Token parsing error", e)
                 Toast.makeText(
                     context,
-                    "Google Sign-In failed: ${e.message}",
+                    "Authentication error. Please try again.",
                     Toast.LENGTH_SHORT
                 ).show()
-            } catch (e: GoogleIdTokenParsingException) {
+            } catch (e: Exception) {
+                android.util.Log.e("GoogleSignIn", "General error", e)
                 Toast.makeText(
                     context,
-                    "Invalid Google ID token",
+                    "Sign-in failed: ${e.localizedMessage ?: "Unknown error"}",
                     Toast.LENGTH_SHORT
                 ).show()
             }

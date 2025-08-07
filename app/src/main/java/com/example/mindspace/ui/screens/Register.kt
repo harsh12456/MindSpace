@@ -25,7 +25,7 @@
 //import com.google.firebase.auth.FirebaseAuth
 //import com.google.firebase.auth.GoogleAuthProvider
 //import com.example.mindspace.viewmodel.AuthViewModel
-//import com.example.mindspace.R
+//import com.example.mindspace.  R
 //
 //@Composable
 //fun Register(
